@@ -1,98 +1,150 @@
-<script>
+<!-- FORM STARTS - SIMPLIFIED VERSION -->
+<form id="accidentForm" class="form-grid" action="YOUR_APPS_SCRIPT_URL" method="POST" target="uploadFrame" enctype="multipart/form-data">
+    <div class="datetime-row">
+        <div class="input-field">
+            <label><i class="fas fa-calendar-alt"></i> Date</label>
+            <input type="date" id="accidentDate" name="date" required>
+        </div>
+        <div class="input-field">
+            <label><i class="fas fa-clock"></i> Time</label>
+            <input type="time" id="accidentTime" name="time" value="14:30" required>
+        </div>
+    </div>
 
-const SCRIPT_URL = "YOUR_SCRIPT_URL"; // paste your Apps Script Web App URL here
+    <div class="two-cols">
+        <div class="input-field">
+            <label><i class="fas fa-car"></i> Vehicle reg.</label>
+            <input type="text" id="vehicleReg" name="vehicleReg" value="FLEET-408" required>
+        </div>
+        <div class="input-field">
+            <label><i class="fas fa-map-pin"></i> Location / street</label>
+            <input type="text" id="location" name="location" placeholder="Detecting address automatically..." value="" required>
+        </div>
+    </div>
 
-const form = document.getElementById("accidentForm");
-const fileInput = document.getElementById("fileInput");
-const progressFill = document.querySelector(".progress-fill");
+    <div class="two-cols">
+        <div class="input-field">
+            <label><i class="fas fa-tag"></i> Accident type</label>
+            <select id="accidentType" name="accidentType" required>
+                <option value="" disabled>– select –</option>
+                <option value="Rear-end" selected>Rear-end collision</option>
+                <option value="Side-impact">Side-impact / T-bone</option>
+                <option value="Rollover">Rollover / jackknife</option>
+                <option value="Single-vehicle">Single vehicle</option>
+                <option value="Other">Other / pedestrian</option>
+            </select>
+        </div>
+        <div class="input-field">
+            <label><i class="fas fa-id-card"></i> Unit #</label>
+            <input type="text" id="unitNumber" name="unitNumber" value="408" required>
+        </div>
+    </div>
 
-let files = [];
+    <div class="two-cols">
+        <div class="input-field">
+            <label><i class="fas fa-user"></i> Driver's name</label>
+            <input type="text" id="driverName" name="driverName" value="James Keller" required>
+        </div>
+        <div class="input-field">
+            <label><i class="fas fa-phone-alt"></i> Driver phone</label>
+            <input type="tel" id="driverPhone" name="driverPhone" value="+1 555 321 7890" required>
+        </div>
+    </div>
 
-fileInput?.addEventListener("change", function(e){
-    files = e.target.files;
-    previewImages(files);
-});
+    <div class="input-field">
+        <label><i class="fas fa-file-signature"></i> Description</label>
+        <textarea id="description" name="description" required>Front bumper crushed, airbags deployed. Slight rain. Other driver exchanged info.</textarea>
+    </div>
 
-function previewImages(files){
+    <div class="input-field">
+        <label><i class="fas fa-car-crash"></i> Other parties involved</label>
+        <input type="text" id="otherParties" name="otherParties" value="Honda CR-V, plate 7GHJ432">
+    </div>
 
-    const previewRow = document.createElement("div");
-    previewRow.className = "image-preview-row";
+    <hr>
+    <div style="font-weight: 600; color: #0f2d55; margin-bottom: 8px;"><i class="fas fa-gavel" style="margin-right: 8px;"></i>OFFICIAL / POLICE INFORMATION</div>
 
-    for(let file of files){
+    <div class="input-field">
+        <label><i class="fas fa-building"></i> Reported to Metro</label>
+        <div class="yes-no-group">
+            <label><input type="radio" name="reportedMetro" value="Yes" checked> Yes</label>
+            <label><input type="radio" name="reportedMetro" value="No"> No</label>
+        </div>
+    </div>
 
-        const img = document.createElement("img");
-        img.className = "preview-thumb";
-        img.src = URL.createObjectURL(file);
+    <div class="two-cols">
+        <div class="input-field">
+            <label><i class="fas fa-user-shield"></i> Officer name</label>
+            <input type="text" id="officerName" name="officerName" value="Officer M. Davis">
+        </div>
+        <div class="input-field">
+            <label><i class="fas fa-mobile-alt"></i> Officer cell</label>
+            <input type="tel" id="officerPhone" name="officerPhone" value="555-987-6543">
+        </div>
+    </div>
 
-        previewRow.appendChild(img);
-    }
+    <div class="input-field">
+        <label><i class="fas fa-wine-bottle"></i> Drunken driving involved</label>
+        <div class="yes-no-group">
+            <label><input type="radio" name="drunkenDriving" value="Yes"> Yes</label>
+            <label><input type="radio" name="drunkenDriving" value="No" checked> No</label>
+        </div>
+    </div>
 
-    fileInput.parentElement.appendChild(previewRow);
-}
+    <div class="input-field">
+        <label><i class="fas fa-hashtag"></i> Incident police report #</label>
+        <input type="text" id="policeReportNo" name="policeReportNo" value="PD-2309-452">
+    </div>
 
-form.addEventListener("submit", async function(e){
+    <div class="input-field">
+        <label><i class="fas fa-balance-scale"></i> Officer's judgement (are you at fault?)</label>
+        <div class="yes-no-group">
+            <label><input type="radio" name="atFault" value="Yes"> Yes, at fault</label>
+            <label><input type="radio" name="atFault" value="No" checked> No, not at fault</label>
+        </div>
+    </div>
 
-    e.preventDefault();
+    <hr>
+    
+    <!-- PHOTO UPLOAD AREA -->
+    <div class="photo-upload-area" id="dropZone">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <div class="upload-text">attach accident image with GPS & date stamp</div>
+        <div class="upload-hint">tap to browse — overlay will be added automatically</div>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
 
-    const btn = document.querySelector(".submit-btn");
-    btn.disabled = true;
-    btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Uploading report...";
+    <!-- live preview -->
+    <div id="previewContainer" class="image-preview-row" style="display: none;">
+        <img id="imagePreview" class="preview-thumb" src="#" alt="stamped preview">
+        <span id="fileNameDisplay" class="file-name-badge"><i class="far fa-image"></i> accident.jpg</span>
+        <div class="attachment-badge">
+            <i class="fas fa-map-marker-alt"></i> <span id="stampLocation">locating…</span>
+        </div>
+        <button type="button" id="clearImageBtn" style="background: none; border:none; color:#b00; margin-left:auto; font-size:1.5rem; cursor:pointer;"><i class="fas fa-times-circle"></i></button>
+    </div>
 
-    const formData = new FormData();
+    <!-- Hidden iframe for submission -->
+    <iframe id="uploadFrame" name="uploadFrame" style="display: none;"></iframe>
 
-    formData.append("accidentDate", document.getElementById("accidentDate").value);
-    formData.append("accidentTime", document.getElementById("accidentTime").value);
-    formData.append("vehicleReg", document.getElementById("vehicleReg").value);
-    formData.append("location", document.getElementById("location").value);
-    formData.append("accidentType", document.getElementById("accidentType").value);
-    formData.append("unitNumber", document.getElementById("unitNumber").value);
-    formData.append("driverName", document.getElementById("driverName").value);
-    formData.append("driverPhone", document.getElementById("driverPhone").value);
+    <!-- hidden fields for image data -->
+    <input type="hidden" id="imageBase64" name="imageBase64" value="">
+    <input type="hidden" id="imageFileName" name="imageFileName" value="">
+    <input type="hidden" id="imageFileType" name="imageFileType" value="">
+    <input type="hidden" id="capturedLat" name="lat" value="">
+    <input type="hidden" id="capturedLon" name="lon" value="">
+    <input type="hidden" id="submissionId" name="submissionId" value="">
 
-    if(files.length > 0){
-
-        const reader = new FileReader();
-
-        reader.onload = async function(){
-
-            formData.append("photo", reader.result);
-
-            await uploadToDrive(formData);
-        }
-
-        reader.readAsDataURL(files[0]);
-
-    } else {
-
-        await uploadToDrive(formData);
-
-    }
-
-});
-
-async function uploadToDrive(formData){
-
-    try{
-
-        const response = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.text();
-
-        document.querySelector(".report-card").innerHTML +=
-        `<div class="success-message">
-        <i class="fas fa-check-circle"></i>
-        Accident report uploaded successfully
-        </div>`;
-
-    }catch(error){
-
-        alert("Upload failed. Please try again.");
-
-    }
-
-}
-
-</script>
+    <!-- Submit Button - now a proper submit button -->
+    <button type="submit" id="submitBtn" class="submit-btn">
+        <i class="fas fa-cloud-upload-alt"></i> SUBMIT TO GOOGLE DRIVE
+    </button>
+    
+    <!-- Status area -->
+    <div id="statusArea" class="info-note" style="display: none;"></div>
+    <div id="successArea" class="success-message" style="display: none;"></div>
+    
+    <div class="info-note" style="margin-top: 10px;" id="attachmentStatus">
+        <i class="fas fa-info-circle"></i> No image — detecting address…
+    </div>
+</form>
