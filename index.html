@@ -1,186 +1,548 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Professional Drive Uploader</title>
-
-<script src="https://accounts.google.com/gsi/client"></script>
-
-<style>
-
-body{
-font-family:Arial;
-background:#f4f6fb;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-
-.container{
-width:450px;
-background:white;
-padding:30px;
-border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.15);
-}
-
-h2{text-align:center}
-
-#drop{
-border:2px dashed #aaa;
-padding:40px;
-text-align:center;
-margin-top:15px;
-cursor:pointer;
-}
-
-#progress{
-width:100%;
-background:#eee;
-height:10px;
-margin-top:15px;
-border-radius:5px;
-}
-
-#bar{
-width:0%;
-height:100%;
-background:#4285f4;
-}
-
-button{
-width:100%;
-padding:12px;
-margin-top:15px;
-border:none;
-background:#4285f4;
-color:white;
-font-size:16px;
-border-radius:5px;
-cursor:pointer;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📤 Image + Text upload to Google Apps Script (with test & debug)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #e6f0f5 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,20,40,0.2), 0 6px 12px rgba(0,0,0,0.1);
+            padding: 30px 28px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #0b3954;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sub {
+            color: #2c5f7b;
+            margin-bottom: 28px;
+            font-size: 1rem;
+            border-left: 4px solid #3f9fd9;
+            padding-left: 16px;
+            background: #d9eaf3;
+            border-radius: 0 20px 20px 0;
+            line-height: 1.4;
+        }
+        .upload-area {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 4px 12px rgba(47, 91, 117, 0.1);
+        }
+        .field {
+            margin-bottom: 24px;
+        }
+        label {
+            font-weight: 600;
+            color: #1d4e6b;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+        .textarea-wrapper, .file-wrapper {
+            background: #f2f9ff;
+            border-radius: 20px;
+            padding: 4px;
+            border: 1px solid #bdd8e9;
+            transition: 0.2s;
+        }
+        .textarea-wrapper:focus-within, .file-wrapper:focus-within {
+            border-color: #0b77b3;
+            box-shadow: 0 0 0 4px rgba(17, 130, 199, 0.15);
+        }
+        textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 16px 18px;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+            font-family: inherit;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 14px 12px;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+        }
+        input[type="file"]::file-selector-button {
+            background: #dbeafe;
+            border: 1px solid #7bb0d1;
+            border-radius: 40px;
+            padding: 8px 16px;
+            margin-right: 20px;
+            font-weight: 500;
+            color: #035a8f;
+            transition: 0.15s;
+            cursor: pointer;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: #b8d3e9;
+            border-color: #2b6c96;
+        }
+        .preview-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            margin-top: 16px;
+            background: #e3f0f9;
+            padding: 16px 20px;
+            border-radius: 34px;
+        }
+        .image-preview-box {
+            flex: 1 1 160px;
+            min-width: 120px;
+        }
+        .image-preview-box p {
+            margin: 0 0 6px 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #0a405a;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 130px;
+            border-radius: 24px;
+            border: 3px solid white;
+            background: #c5dbe9;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
+        .file-info {
+            flex: 2;
+            font-size: 0.9rem;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 36px;
+            color: #1e5370;
+            box-shadow: inset 0 1px 4px #b9d4e5;
+            word-break: break-word;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 28px 0 12px;
+            justify-content: space-between;
+        }
+        .btn {
+            background: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 50, 80, 0.15);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid rgba(255,255,255,0.8);
+            flex: 1 0 auto;
+            color: #052c3f;
+        }
+        .btn-primary {
+            background: #1673b1;
+            color: white;
+            box-shadow: 0 8px 16px #a2c9e4;
+            border: 1px solid #4797cf;
+        }
+        .btn-primary:hover {
+            background: #0d5f94;
+            transform: scale(1.02);
+            box-shadow: 0 12px 20px #89b8d8;
+        }
+        .btn-secondary {
+            background: #daeaf5;
+            border: 1px solid #b1d0e5;
+        }
+        .btn-secondary:hover {
+            background: #c7ddec;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .console-box {
+            background: #0b202b;
+            color: #b4e6fd;
+            border-radius: 26px;
+            padding: 18px 22px;
+            font-family: 'Menlo', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin: 24px 0 12px;
+            border: 2px solid #2b688b;
+            box-shadow: inset 0 0 0 1px #4c9acd;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .console-header {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 6px;
+            color: #aad0f0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .badge {
+            background: #104d6b;
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            color: white;
+        }
+        .success-text { color: #9bffb3; }
+        .error-text { color: #ffb0b0; }
+        .warning-text { color: #f7e794; }
+        .footnote {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #2e607b;
+            margin-top: 20px;
+            border-top: 1px dashed #a0c6dd;
+            padding-top: 18px;
+        }
+        .inline-code {
+            background: #1d3f53;
+            color: #eef9ff;
+            padding: 2px 8px;
+            border-radius: 40px;
+        }
+    </style>
 </head>
-
 <body>
+    <div class="card">
+        <h1>🖼️📝 Upload to Apps Script</h1>
+        <div class="sub">🔧 internal debug & test — no external server needed</div>
 
-<div class="container">
+        <div class="upload-area">
+            <!-- Text field -->
+            <div class="field">
+                <label>📄 Description / text content</label>
+                <div class="textarea-wrapper">
+                    <textarea id="textInput" rows="3" placeholder="Write something… e.g., 'Summer trip picture' or any metadata">Beautiful sunset</textarea>
+                </div>
+            </div>
 
-<h2>Google Drive Upload</h2>
+            <!-- File field -->
+            <div class="field">
+                <label>📸 Image (PNG, JPG, WEBP, etc.)</label>
+                <div class="file-wrapper">
+                    <input type="file" id="imageInput" accept="image/*" capture="environment">
+                </div>
+            </div>
 
-<button onclick="login()">Login With Google</button>
+            <!-- preview & info (auto-update) -->
+            <div class="preview-row" id="previewRow" style="display: none;">
+                <div class="image-preview-box">
+                    <p>🔍 preview</p>
+                    <img id="imagePreview" src="#" alt="preview">
+                </div>
+                <div class="file-info" id="fileInfo">ℹ️ no file selected</div>
+            </div>
+        </div>
 
-<input type="file" id="file" />
+        <!-- action buttons -->
+        <div class="button-group">
+            <button class="btn btn-secondary" id="testBtn">🧪 RUN INTERNAL TEST</button>
+            <button class="btn btn-primary" id="uploadBtn">🚀 SEND TO Google Apps Script</button>
+        </div>
 
-<div id="progress">
-<div id="bar"></div>
-</div>
+        <!-- debug / internal console -->
+        <div class="console-box" id="console">
+            <div class="console-header">
+                <span>🐞 debug & test console</span>
+                <span class="badge">v2.0 • fixed</span>
+            </div>
+            <div id="logContent">[Ready] Click "internal test" to simulate, or upload to real endpoint.<br>👉 All errors are caught and displayed here.</div>
+        </div>
+        <div class="footnote">
+            ⚙️ Google Apps Script Web App URL (POST) → <span class="inline-code" id="gasUrlDisplay">(set below in code)</span><br>
+            <span style="opacity:0.7;">edit <code>APPS_SCRIPT_URL</code> in script before real deployment</span>
+        </div>
+    </div>
 
-<button onclick="uploadFile()">Upload File</button>
+    <script>
+        (function() {
+            // --- CONFIGURATION (change this to your deployed Apps Script URL) ---
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFakeTestURL1234567890/exec'; 
+            // For demo, it's a placeholder. Real requests will fail but we show CORS/error simulation.
+            // In test mode we mock a successful response.
 
-<p id="status"></p>
+            // DOM elements
+            const textArea = document.getElementById('textInput');
+            const fileInput = document.getElementById('imageInput');
+            const previewRow = document.getElementById('previewRow');
+            const imagePreview = document.getElementById('imagePreview');
+            const fileInfoDiv = document.getElementById('fileInfo');
+            const logContent = document.getElementById('logContent');
+            const gasUrlDisplay = document.getElementById('gasUrlDisplay');
 
-</div>
+            // update displayed GAS url (truncated for readability)
+            gasUrlDisplay.textContent = APPS_SCRIPT_URL.length > 50 ? APPS_SCRIPT_URL.substring(0,45)+'…' : APPS_SCRIPT_URL;
 
-<script>
+            // ---------- Helper: log to console box (with auto scroll) ----------
+            function updateLog(message, type = 'info') {
+                const prefix = {
+                    'success': '✅ ',
+                    'error':   '❌ ',
+                    'warning': '⚠️ ',
+                    'info':    '• '
+                }[type] || '• ';
+                const colorClass = {
+                    'success': 'success-text',
+                    'error': 'error-text',
+                    'warning': 'warning-text',
+                    'info': ''
+                }[type] || '';
+                const newLine = document.createElement('div');
+                newLine.className = colorClass;
+                newLine.innerHTML = prefix + message.replace(/\n/g, '<br>');
+                logContent.appendChild(newLine);
+                // keep last 12-15 lines sliding window (optional, but keep console cleanish)
+                if (logContent.children.length > 20) {
+                    logContent.removeChild(logContent.children[0]);
+                }
+                // auto-scroll
+                const consoleDiv = document.getElementById('console');
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            }
 
-const CLIENT_ID = "PASTE_CLIENT_ID_HERE";
+            function clearLog() {
+                logContent.innerHTML = '';   // clear
+                updateLog('[session cleared]', 'info');
+            }
 
-let accessToken = null;
+            // ---------- preview & validation ----------
+            function handleFileSelect() {
+                const file = fileInput.files[0];
+                if (!file) {
+                    previewRow.style.display = 'none';
+                    imagePreview.src = '#';
+                    fileInfoDiv.innerText = '⚠️ no file selected';
+                    return;
+                }
 
-function login(){
+                // Basic file validation (type/size)
+                if (!file.type.startsWith('image/')) {
+                    updateLog(`File type "${file.type}" is not an image.`, 'warning');
+                    fileInfoDiv.innerText = `❗ Not an image (${file.type || 'unknown'})`;
+                } else {
+                    fileInfoDiv.innerText = `📎 ${file.name} · (${(file.size / 1024).toFixed(1)} KB) · ${file.type}`;
+                }
 
-google.accounts.oauth2.initTokenClient({
-client_id: CLIENT_ID,
-scope: "https://www.googleapis.com/auth/drive.file",
-callback: (tokenResponse)=>{
-accessToken = tokenResponse.access_token;
-document.getElementById("status").innerText="Logged in";
-}
-}).requestAccessToken();
+                // Preview (if image)
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'80\' viewBox=\'0 0 100 80\'%3E%3Crect width=\'100\' height=\'80\' fill=\'%23a0c4db\'/%3E%3Ctext x=\'20\' y=\'45\' font-family=\'system-ui\' font-size=\'14\' fill=\'%231d4e6b\'%3Enot image%3C/text%3E%3C/svg%3E';
+                }
 
-}
+                previewRow.style.display = 'flex';
+            }
 
-async function uploadFile(){
+            fileInput.addEventListener('change', handleFileSelect);
 
-const file = document.getElementById("file").files[0];
+            // ---------- reset & init ----------
+            function resetFileInput() {
+                fileInput.value = '';
+                previewRow.style.display = 'none';
+                imagePreview.src = '#';
+                fileInfoDiv.innerText = 'ℹ️ no file selected';
+            }
 
-if(!file){
-alert("Select file");
-return;
-}
+            // ---------- internal test (mock successful upload) ----------
+            function runInternalTest() {
+                clearLog();
+                updateLog('🧪 INTERNAL TEST STARTED (simulated)', 'info');
 
-const metadata = {
-name:file.name,
-mimeType:file.type
-};
+                // 1. read current fields
+                const text = textArea.value.trim();
+                const file = fileInput.files[0];
 
-const res = await fetch(
-"https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
-{
-method:"POST",
-headers:{
-Authorization:"Bearer "+accessToken,
-"Content-Type":"application/json"
-},
-body:JSON.stringify(metadata)
-});
+                // 2. validation (same as real)
+                if (!text && !file) {
+                    updateLog('Both text and image are empty — that\'s allowed, but sending minimal payload', 'warning');
+                }
+                if (file && !file.type.startsWith('image/')) {
+                    updateLog('File is not an image — test will treat as binary, but server might reject', 'warning');
+                }
 
-const uploadUrl = res.headers.get("Location");
+                // 3. simulate building FormData
+                const formData = new FormData();
+                formData.append('text', text || '');
+                if (file) {
+                    formData.append('image', file, file.name);
+                    updateLog(`File attached: ${file.name} (${(file.size/1024).toFixed(2)} KB)`, 'success');
+                } else {
+                    updateLog('No image file — text-only payload', 'info');
+                }
 
-uploadChunks(file,uploadUrl);
+                // 4. fake async delay to mimic network + success
+                updateLog('⏳ Simulating network round-trip ...', 'info');
+                setTimeout(() => {
+                    // generate fake response like Apps Script would (JSON)
+                    const fakeResponse = {
+                        status: 'success',
+                        message: 'Test: data would be received by Google Apps Script',
+                        receivedText: text || '(empty)',
+                        receivedFile: file ? file.name : 'none',
+                        timestamp: new Date().toISOString()
+                    };
+                    updateLog(`✅ TEST SUCCESS (mock) — server response:`, 'success');
+                    updateLog(JSON.stringify(fakeResponse, null, 2), 'success');
+                    updateLog('🧪 Internal test finished. No actual data sent.', 'info');
+                }, 800); // 0.8 sec delay feels realistic
+            }
 
-}
+            // ---------- REAL UPLOAD to Google Apps Script (with error handling) ----------
+            async function uploadToGAS() {
+                clearLog();
+                updateLog('🚀 Preparing upload to Apps Script...', 'info');
 
-function uploadChunks(file,url){
+                // validation (but we still continue even if some fields missing)
+                const text = textArea.value.trim();
+                const file = fileInput.files[0];
 
-const chunkSize = 5 * 1024 * 1024;
+                if (!text && !file) {
+                    updateLog('Both text and image are empty — sending minimal request', 'warning');
+                }
+                if (file && !file.type.startsWith('image/')) {
+                    updateLog('Warning: file is not an image; might be rejected by server', 'warning');
+                }
 
-let start = 0;
+                // Build FormData
+                const formData = new FormData();
+                formData.append('text', text || '');   // always send (even empty)
+                if (file) {
+                    formData.append('image', file, file.name);
+                    updateLog(`📎 image attached: ${file.name} (${(file.size/1024).toFixed(1)} KB)`, 'success');
+                } else {
+                    formData.append('image', '');      // some backends prefer field even if empty
+                    updateLog('no image selected — sending only text', 'info');
+                }
 
-function next(){
+                // Show what we are about to POST
+                updateLog(`Target URL: ${APPS_SCRIPT_URL}`, 'info');
 
-let end = Math.min(start + chunkSize,file.size);
+                try {
+                    // Use fetch with FormData. Important: DO NOT set Content-Type header manually (browser sets with boundary)
+                    updateLog('⏳ sending request (CORS, no-cors mode not used — we want response) ...', 'info');
 
-let blob = file.slice(start,end);
+                    const response = await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: formData,
+                        // mode: 'cors' is default; credentials omitted.
+                    });
 
-fetch(url,{
-method:"PUT",
-headers:{
-"Content-Length": blob.size,
-"Content-Range": `bytes ${start}-${end-1}/${file.size}`
-},
-body:blob
-})
-.then(res=>{
+                    updateLog(`📡 Response status: ${response.status} ${response.statusText}`, 'info');
 
-start=end;
+                    // Try to parse response (Apps Script usually returns JSON or text)
+                    const contentType = response.headers.get('content-type') || '';
+                    let responseData;
+                    if (contentType.includes('application/json')) {
+                        responseData = await response.json();
+                    } else {
+                        // fallback to text
+                        responseData = await response.text();
+                    }
 
-let percent = Math.round((start/file.size)*100);
+                    if (response.ok) {
+                        updateLog('✅ Upload successful! Server responded:', 'success');
+                    } else {
+                        updateLog(`⚠️ Server returned error (${response.status})`, 'error');
+                    }
 
-document.getElementById("bar").style.width=percent+"%";
+                    // pretty print response
+                    if (typeof responseData === 'object') {
+                        updateLog(JSON.stringify(responseData, null, 2), response.ok ? 'success' : 'error');
+                    } else {
+                        updateLog(responseData || '(empty response)', response.ok ? 'info' : 'error');
+                    }
 
-if(start < file.size){
+                } catch (error) {
+                    // Comprehensive error handling (network, CORS, preflight, DNS, etc)
+                    updateLog(`🔥 FETCH/network ERROR: ${error.message}`, 'error');
+                    if (error.message.includes('Failed to fetch')) {
+                        updateLog('🧾 Possible causes: CORS, preflight failure, invalid URL, or Apps Script not deployed as web app with "anyone" access. Did you set correct URL?', 'warning');
+                        updateLog('💡 Make sure your Apps Script is published as "Web App" with access "Anyone" even anonymous, and that you use the **exec** link.', 'warning');
+                    } else {
+                        updateLog('🧾 See browser console for more details.', 'warning');
+                    }
+                    console.error('upload error:', error);
+                } finally {
+                    updateLog('🏁 Upload function finished.', 'info');
+                }
+            }
 
-next();
+            // ---------- wire buttons with double error protection ----------
+            document.getElementById('testBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                try {
+                    runInternalTest();
+                } catch (err) {
+                    updateLog(`Unexpected test error: ${err.message}`, 'error');
+                    console.error(err);
+                }
+            });
 
-}else{
+            document.getElementById('uploadBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                // Basic sanity: if URL still contains 'fake' or 'FakeTestURL' warn but continue
+                if (APPS_SCRIPT_URL.includes('fake') || APPS_SCRIPT_URL.includes('FakeTestURL')) {
+                    updateLog('❗ The current APPS_SCRIPT_URL appears to be a placeholder. Replace with your real deployed URL.', 'warning');
+                }
+                uploadToGAS().catch(err => {
+                    // in case async error slips (should be caught inside, but double shield)
+                    updateLog(`Unhandled promise rejection: ${err.message}`, 'error');
+                });
+            });
 
-document.getElementById("status").innerText="Upload complete";
+            // set initial log
+            updateLog('Ready. Use internal test to debug, then upload. All errors are caught and shown here.', 'info');
 
-}
-
-});
-
-}
-
-next();
-
-}
-
-</script>
-
+            // automatically show preview if page loads with pre-selected file? (edge)
+            if (fileInput.files.length > 0) handleFileSelect();
+        })();
+    </script>
 </body>
 </html>
