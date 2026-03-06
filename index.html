@@ -630,16 +630,14 @@
 
     <script>
         (function() {
-            // ========== CONFIGURATION - REPLACE THESE VALUES ==========
-            // Google Apps Script Web App URL - YOU NEED TO REPLACE THIS WITH YOUR ACTUAL URL
-            // After deploying your Google Apps Script, you'll get a URL like:
-            // https://script.google.com/macros/s/AKfycbz6dLNv6LzK0WJYqvQqJqF0xQ/exec
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbx4SoTlyTCO9wNBybzxPzcI60_lML3G2S-WKtM-1XCDjtedNsFVZZsaDn2_fE4xO-_Z/exec'; // <-- REPLACE THIS WITH YOUR ACTUAL URL
+            // ========== GOOGLE APPS SCRIPT URL - NOW EMBEDDED AND FUNCTIONAL ==========
+            // The exact URL you provided - now properly configured
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbx4SoTlyTCO9wNBybzxPzcI60_lML3G2S-WKtM-1XCDjtedNsFVZZsaDn2_fE4xO-_Z/exec';
             
-            // Google Sheet ID - Already provided
+            // Google Sheet ID - Your provided sheet
             const SHEET_ID = '1vhtaNNmY-YsyDiaA2IFodoBYdQsEcL09F7BgMJo4utI';
             
-            // Google Drive Folder ID - Already provided
+            // Google Drive Folder ID - Your provided folder
             const DRIVE_FOLDER_ID = '1al8guXtgk-PJWwdNvd2umUXYv4AvwXSM';
             // ===========================================================
 
@@ -918,12 +916,6 @@
                 const data = getFormData();
                 if (!validateForm(data)) return;
 
-                // Check if GAS URL is configured
-                if (GAS_URL === 'https://script.google.com/macros/s/AKfycbx4SoTlyTCO9wNBybzxPzcI60_lML3G2S-WKtM-1XCDjtedNsFVZZsaDn2_fE4xO-_Z/exec') {
-                    alert('⚠️ Please configure your Google Apps Script URL in the code.\n\n1. Deploy your Google Apps Script as a Web App\n2. Copy the URL\n3. Replace "https://script.google.com/macros/s/AKfycbx4SoTlyTCO9wNBybzxPzcI60_lML3G2S-WKtM-1XCDjtedNsFVZZsaDn2_fE4xO-_Z/exec" with your actual URL');
-                    return;
-                }
-
                 // Show loading state
                 const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Submitting...';
@@ -931,7 +923,7 @@
                 attachmentStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sending to Google Sheets...';
 
                 try {
-                    // Send data to Google Apps Script
+                    // Send data to Google Apps Script using fetch with proper CORS mode
                     const response = await fetch(GAS_URL, {
                         method: 'POST',
                         mode: 'no-cors', // Important for Google Apps Script
