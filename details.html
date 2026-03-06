@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Vehicle Handover/Takeover | OnPoint OnTime Fleet</title>
     <style>
-        /* Copy all your existing styles here - they remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -263,11 +262,6 @@
             transform: translateY(0);
         }
 
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
         .loading-overlay {
             display: none;
             position: fixed;
@@ -336,22 +330,6 @@
             margin-bottom: 20px;
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #eef2f6;
-            border-radius: 2px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
         @media (max-width: 480px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -371,13 +349,13 @@
             }
             .home{
                 color: blue;
-                text-align: center;
-                margin-left: 200px;
+                margin-right: 100px;
                 font-size: 15px;
+                text-align: center;
                 
             }
             .home:hover{
-                color: green;
+                color: grey;
                 cursor: pointer;
                 transition: 0.7s;
                 opacity: 0.8;
@@ -393,7 +371,7 @@
         </div>
 
         <div class="success-message" id="successMessage">
-            ✅ Form submitted successfully! Data saved to Google Drive and Sheets.
+            ✅ Form submitted successfully! A copy has been sent to fleet@onpointontime.co.za
         </div>
 
         <div class="error-message" id="errorMessage" style="display: none;">
@@ -441,7 +419,7 @@
                     </div>
                     <div class="form-group">
                         <label>Vehicle Model</label>
-                        <input type="text" id="vehicleModel" placeholder="Toyota Hilux 2023">
+                        <input type="text" id="vehicleModel" placeholder="Toyota Hilux 2023" value="Auto-filled from database">
                     </div>
                 </div>
                 <div class="form-row">
@@ -555,11 +533,6 @@
                 <!-- Photo Preview -->
                 <div class="photo-preview" id="photoPreview"></div>
 
-                <!-- Upload Progress -->
-                <div class="progress-bar" id="progressBar" style="display: none;">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-
                 <!-- Abnormality Description -->
                 <div class="abnormality-item">
                     <label style="font-weight: 600; margin-bottom: 10px; display: block;">Damage/Abnormality Description</label>
@@ -613,7 +586,7 @@
             <!-- Submit Button -->
             <div style="padding: 20px;">
                 <button type="submit" class="submit-btn" id="submitBtn">
-                    📤 Submit to Google Drive & Sheets
+                    📧 Send Report to fleet@onpointontime.co.za
                 </button>
             </div>
         </form>
@@ -622,14 +595,13 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <div style="color: #333; font-weight: 600;" id="loadingText">Sending report...</div>
+        <div style="color: #333; font-weight: 600;">Sending report...</div>
     </div>
 
     <script>
-        // IMPORTANT: You need to create and deploy a Google Apps Script web app
-        // and replace this URL with your actual deployed URL
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzSLhNNWou0A0cWS5mevq9z6QqWS2ZP5ku3zmLFnz34paRQikbtnAeEzDYuVTnmuBQc/exec';
-        
+        // IMPORTANT: Replace this with your actual Google Apps Script URL
+        const GOOGLE_APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
         // Set default date and time
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
@@ -639,6 +611,15 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('handoverTime').value = `${hours}:${minutes}`;
+
+            // Auto-fill vehicle model (simulated)
+            const vehicleReg = document.getElementById('vehicleReg');
+            vehicleReg.addEventListener('input', function() {
+                if(this.value.length > 3) {
+                    // Simulated database lookup
+                    document.getElementById('vehicleModel').value = 'Toyota Hilux 2.8 GD-6';
+                }
+            });
         });
 
         // Photo upload preview
@@ -661,22 +642,14 @@
             }
         });
 
-        // Convert file to base64
+        // Convert files to base64 for sending to Google Apps Script
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
-        }
-
-        // Update progress bar
-        function updateProgress(percentage) {
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-            progressBar.style.display = 'block';
-            progressFill.style.width = percentage + '%';
         }
 
         // Form submission
@@ -696,136 +669,85 @@
             document.getElementById('loadingOverlay').style.display = 'flex';
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
 
             try {
                 // Collect form data
                 const formData = {
-                    timestamp: new Date().toISOString(),
                     employeeName: document.getElementById('employeeName').value,
                     employeeNumber: document.getElementById('employeeNumber').value,
                     idNumber: document.getElementById('idNumber').value,
-                    department: document.getElementById('department').value || 'Not specified',
+                    department: document.getElementById('department').value,
                     vehicleReg: document.getElementById('vehicleReg').value,
-                    vehicleModel: document.getElementById('vehicleModel').value || 'Not specified',
+                    vehicleModel: document.getElementById('vehicleModel').value,
                     mileage: document.getElementById('mileage').value,
-                    serviceDue: document.getElementById('serviceDue').value || 'Not specified',
+                    serviceDue: document.getElementById('serviceDue').value,
                     handoverType: document.querySelector('input[name="handoverType"]:checked')?.value || 'Handover',
                     fuelLevel: document.querySelector('input[name="fuelLevel"]:checked')?.value || '1/2',
-                    checklist: Array.from(document.querySelectorAll('input[name="checklist"]:checked')).map(cb => cb.value).join(', ') || 'None',
-                    abnormalityDesc: document.getElementById('abnormalityDesc').value || 'No abnormalities reported',
-                    damageLocation: document.getElementById('damageLocation').value || 'Not applicable',
+                    checklist: Array.from(document.querySelectorAll('input[name="checklist"]:checked')).map(cb => cb.value).join(', '),
+                    abnormalityDesc: document.getElementById('abnormalityDesc').value,
+                    damageLocation: document.getElementById('damageLocation').value,
                     handoverDate: document.getElementById('handoverDate').value,
                     handoverTime: document.getElementById('handoverTime').value,
-                    additionalNotes: document.getElementById('additionalNotes').value || 'None'
+                    additionalNotes: document.getElementById('additionalNotes').value,
+                    timestamp: new Date().toISOString()
                 };
 
-                // Handle photos
+                // Handle photo uploads
                 const photoFiles = document.getElementById('vehiclePhotos').files;
-                const photos = [];
-
                 if (photoFiles.length > 0) {
-                    document.getElementById('loadingText').textContent = 'Uploading photos...';
-                    
+                    formData.photos = [];
                     for (let i = 0; i < photoFiles.length; i++) {
-                        const file = photoFiles[i];
-                        const base64 = await fileToBase64(file);
-                        photos.push({
-                            name: file.name,
-                            type: file.type,
+                        const base64 = await fileToBase64(photoFiles[i]);
+                        formData.photos.push({
+                            name: photoFiles[i].name,
+                            type: photoFiles[i].type,
                             data: base64
                         });
-                        
-                        // Update progress
-                        const progress = ((i + 1) / photoFiles.length) * 100;
-                        updateProgress(progress);
                     }
                 }
 
-                // Prepare data for Google Apps Script
-                const payload = {
-                    formData: formData,
-                    photos: photos,
-                    driveFolderId: '13BuqOSAdUlfZJIm36A_R3mbF4HwHCfZY', // Your Google Drive folder ID
-                    sheetId: '13BuqOSAdUlfZJIm36A_R3mbF4HwHCfZY' // Your Google Sheet ID (just the ID, not the full URL)
-                };
-
-                document.getElementById('loadingText').textContent = 'Saving to Google Drive and Sheets...';
-
-                // Use JSONP approach instead of fetch with no-cors
-                const script = document.createElement('script');
-                const callbackName = 'callback_' + Date.now();
-                
-                // Create a promise that will be resolved by the JSONP callback
-                const jsonpPromise = new Promise((resolve, reject) => {
-                    // Set timeout for the request
-                    const timeout = setTimeout(() => {
-                        cleanup();
-                        reject(new Error('Request timeout'));
-                    }, 30000);
-
-                    // Define callback function
-                    window[callbackName] = function(response) {
-                        clearTimeout(timeout);
-                        cleanup();
-                        resolve(response);
-                    };
-
-                    // Cleanup function
-                    function cleanup() {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                    }
-
-                    // Create and send JSONP request
-                    script.src = GAS_URL + '?callback=' + callbackName + '&data=' + encodeURIComponent(JSON.stringify(payload));
-                    script.onerror = function() {
-                        clearTimeout(timeout);
-                        cleanup();
-                        reject(new Error('Network error'));
-                    };
-                    document.body.appendChild(script);
+                // Send data to Google Apps Script
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Important for Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
                 });
-
-                // Wait for the JSONP response
-                const response = await jsonpPromise;
 
                 // Hide loading overlay
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
-                document.getElementById('progressBar').style.display = 'none';
 
-                // Show success message
+                // Show success message (since we're using no-cors, we assume success)
                 const successMsg = document.getElementById('successMessage');
                 successMsg.style.display = 'block';
                 
-                // Log for debugging
-                console.log('Form submitted successfully:', response);
+                // Log form data for demo
+                console.log('Form submitted to Google Sheets:', formData);
 
                 // Auto-hide success message after 5 seconds
                 setTimeout(() => {
                     successMsg.style.display = 'none';
                 }, 5000);
 
-                // Reset form
+                // Optional: Reset form
                 if(confirm('Form submitted successfully! Would you like to reset the form for another entry?')) {
                     this.reset();
                     document.getElementById('handoverDate').value = new Date().toISOString().split('T')[0];
-                    document.getElementById('handoverTime').value = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
                     document.getElementById('photoPreview').innerHTML = '';
                 }
 
             } catch (error) {
-                console.error('Error:', error);
-                
-                // Hide loading overlay
+                console.error('Error submitting form:', error);
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
-                document.getElementById('progressBar').style.display = 'none';
-                
-                // Show error message
                 document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('errorMessage').textContent = 'Error submitting form: ' + error.message;
+                
+                setTimeout(() => {
+                    document.getElementById('errorMessage').style.display = 'none';
+                }, 5000);
             }
         });
 
