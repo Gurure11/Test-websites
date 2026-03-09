@@ -46,10 +46,6 @@
             gap: 10px;
         }
 
-        .header h1 span {
-            font-size: 1.5em;
-        }
-
         .nav-buttons {
             display: flex;
             gap: 15px;
@@ -88,7 +84,6 @@
         .refresh-btn:hover {
             background: #f0f0f0;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .export-btn {
@@ -99,7 +94,6 @@
         .export-btn:hover {
             background: #218838;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .content {
@@ -124,7 +118,6 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
         .stat-title {
@@ -144,13 +137,6 @@
         .stat-value small {
             font-size: 0.5em;
             color: #999;
-            font-weight: normal;
-        }
-
-        .stat-detail {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
         }
 
         .filters-section {
@@ -176,13 +162,11 @@
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 1em;
-            transition: all 0.3s;
         }
 
         .search-box input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .filter-select {
@@ -200,7 +184,6 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             overflow: auto;
             max-height: 600px;
-            position: relative;
         }
 
         table {
@@ -216,11 +199,9 @@
             font-weight: 600;
             font-size: 0.85em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             position: sticky;
             top: 0;
             z-index: 10;
-            white-space: nowrap;
         }
 
         td {
@@ -238,11 +219,6 @@
             background-color: #fafafa;
         }
 
-        .amount-positive {
-            color: #28a745;
-            font-weight: 600;
-        }
-
         .drive-link {
             color: #667eea;
             text-decoration: none;
@@ -257,27 +233,7 @@
 
         .drive-link:hover {
             text-decoration: underline;
-            color: #764ba2;
             white-space: normal;
-            word-break: break-all;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 50px;
-            font-size: 0.8em;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-warning {
-            background: #fff3cd;
-            color: #856404;
         }
 
         .loading {
@@ -303,11 +259,27 @@
         .error {
             background: #fee;
             color: #c00;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: 15px;
             margin: 20px 0;
             text-align: center;
             border: 2px solid #fcc;
+        }
+
+        .error button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+        }
+
+        .error button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .footer {
@@ -316,19 +288,6 @@
             color: #666;
             border-top: 1px solid #eee;
             background: #fafafa;
-        }
-
-        .date-range {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .date-input {
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.9em;
         }
 
         .clear-filters {
@@ -342,27 +301,14 @@
             color: #764ba2;
         }
 
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .content {
-                padding: 15px;
-            }
-            
-            .filters-section {
-                flex-direction: column;
-            }
-            
-            .filter-select {
-                width: 100%;
-            }
+        .proxy-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #ffeeba;
         }
     </style>
 </head>
@@ -377,7 +323,7 @@
                 <a href="#" onclick="window.location.reload()" class="home-btn">
                     <span>🏠</span> Home
                 </a>
-                <button class="export-btn" onclick="exportToCSV()">
+                <button class="export-btn" onclick="exportToCSV()" id="exportBtn" disabled>
                     <span>📥</span> Export CSV
                 </button>
                 <button class="refresh-btn" onclick="loadData()">
@@ -390,10 +336,15 @@
             <!-- Statistics Cards -->
             <div id="statsContainer" class="stats-grid"></div>
 
+            <!-- CORS Proxy Notice -->
+            <div id="proxyNote" class="proxy-note" style="display: none;">
+                ⚡ Using CORS proxy to fetch data. This is a temporary solution.
+            </div>
+
             <!-- Filters Section -->
             <div class="filters-section" id="filtersSection" style="display: none;">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Search by driver, vehicle, notes..." onkeyup="filterData()">
+                    <input type="text" id="searchInput" placeholder="🔍 Search..." onkeyup="filterData()">
                 </div>
                 <select id="vehicleFilter" class="filter-select" onchange="filterData()">
                     <option value="">All Vehicles</option>
@@ -401,18 +352,14 @@
                 <select id="driverFilter" class="filter-select" onchange="filterData()">
                     <option value="">All Drivers</option>
                 </select>
-                <div class="date-range">
-                    <input type="date" id="dateFrom" class="date-input" onchange="filterData()" placeholder="From">
-                    <span>to</span>
-                    <input type="date" id="dateTo" class="date-input" onchange="filterData()" placeholder="To">
-                </div>
-                <span class="clear-filters" onclick="clearFilters()">Clear All Filters</span>
+                <span class="clear-filters" onclick="clearFilters()">Clear Filters</span>
             </div>
 
             <!-- Loading Indicator -->
-            <div id="loading" class="loading" style="display: none;">
+            <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Loading fuel data...</p>
+                <p>Connecting to Google Sheets...</p>
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px;">This may take a few seconds</p>
             </div>
 
             <!-- Error Message -->
@@ -429,18 +376,28 @@
 
         <div class="footer">
             <p>Last updated: <span id="lastUpdated">Never</span></p>
-            <p style="font-size: 0.85em; margin-top: 5px;">Total Records: <span id="totalRecords">0</span> | Showing: <span id="showingRecords">0</span></p>
+            <p>Total Records: <span id="totalRecords">0</span> | Showing: <span id="showingRecords">0</span></p>
         </div>
     </div>
 
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5_H_pe9EW7mheqxR_RrNKMKnOc1y8GRhJ_DYrSE8ReNZGC1bs4IyIwugJJgh_FjYn/exec';
         
+        // CORS proxy URLs to try (in order)
+        const CORS_PROXIES = [
+            '', // Try direct connection first
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.allorigins.win/raw?url=',
+            'https://thingproxy.freeboard.io/fetch/'
+        ];
+        
+        let currentProxyIndex = 0;
         let originalData = [];
         let filteredData = [];
         let uniqueVehicles = new Set();
         let uniqueDrivers = new Set();
 
+        // Load data immediately
         window.onload = function() {
             loadData();
         };
@@ -448,58 +405,98 @@
         async function loadData() {
             showLoading();
             
-            try {
-                const url = APPS_SCRIPT_URL + '?t=' + new Date().getTime();
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: { 'Accept': 'application/json' }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const text = await response.text();
-                let data;
+            // Try each proxy until one works
+            for (let i = 0; i < CORS_PROXIES.length; i++) {
+                currentProxyIndex = i;
+                const proxyUrl = CORS_PROXIES[i];
                 
                 try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    const jsonMatch = text.match(/\{.*\}/s);
-                    if (jsonMatch) {
-                        data = JSON.parse(jsonMatch[0]);
+                    let url;
+                    if (proxyUrl) {
+                        // Show proxy notice
+                        document.getElementById('proxyNote').style.display = 'block';
+                        // Encode the Apps Script URL for the proxy
+                        url = proxyUrl + encodeURIComponent(APPS_SCRIPT_URL + '?t=' + new Date().getTime());
                     } else {
-                        throw new Error('Invalid response format');
+                        // Direct connection
+                        document.getElementById('proxyNote').style.display = 'none';
+                        url = APPS_SCRIPT_URL + '?t=' + new Date().getTime();
                     }
+                    
+                    console.log(`Trying proxy ${i}: ${proxyUrl || 'direct'}`);
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'no-cache',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const text = await response.text();
+                    console.log('Response received, length:', text.length);
+                    
+                    // Try to parse the response
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        // If not JSON, try to extract JSON from the response
+                        const jsonMatch = text.match(/\{.*\}/s);
+                        if (jsonMatch) {
+                            data = JSON.parse(jsonMatch[0]);
+                        } else {
+                            throw new Error('Invalid response format');
+                        }
+                    }
+                    
+                    if (!data.success) {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                    
+                    // Success! Process the data
+                    processData(data);
+                    return;
+                    
+                } catch (error) {
+                    console.log(`Proxy ${i} failed:`, error.message);
+                    // Continue to next proxy
                 }
-                
-                if (!data.success) throw new Error(data.error);
-                
-                processData(data);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showError(error.message);
             }
+            
+            // If all proxies failed
+            showError(
+                'Unable to connect to Google Sheets. This is usually due to CORS restrictions.<br><br>' +
+                'To fix this permanently, you need to host this HTML file in one of these ways:<br>' +
+                '1. Use Google Apps Script to serve the HTML (recommended)<br>' +
+                '2. Use a simple HTTP server like "python -m http.server"<br>' +
+                '3. Use GitHub Pages or Netlify to host the file<br><br>' +
+                'Or try opening this HTML file using the "Live Server" extension in VS Code.'
+            );
         }
 
         function processData(result) {
             originalData = result.data;
             filteredData = [...originalData];
             
-            // Extract unique vehicles and drivers for filters
+            // Extract unique values for filters
             originalData.forEach(row => {
                 if (row['Vehicle Registration']) uniqueVehicles.add(row['Vehicle Registration']);
                 if (row['Driver Name']) uniqueDrivers.add(row['Driver Name']);
             });
             
-            // Populate filter dropdowns
+            // Populate filters
             populateFilters();
             
             // Calculate and display statistics
             calculateStats(originalData);
             
-            // Display table headers and data
+            // Display headers and data
             displayHeaders(result.headers);
             displayRows(originalData);
             
@@ -509,6 +506,8 @@
             document.getElementById('showingRecords').textContent = originalData.length;
             document.getElementById('filtersSection').style.display = 'flex';
             document.getElementById('tableContainer').style.display = 'block';
+            document.getElementById('exportBtn').disabled = false;
+            
             hideLoading();
         }
 
@@ -537,28 +536,23 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-title">Total Distance</div>
-                    <div class="stat-value">${totalKm.toLocaleString()} <small>km</small></div>
-                    <div class="stat-detail">Avg ${(totalKm/data.length).toFixed(1)} km/trip</div>
+                    <div class="stat-value">${Number(totalKm).toLocaleString()} <small>km</small></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-title">Total Fuel</div>
-                    <div class="stat-value">${totalFuel.toLocaleString()} <small>L</small></div>
-                    <div class="stat-detail">Avg ${avgKmPerLiter} km/L</div>
+                    <div class="stat-value">${Number(totalFuel).toLocaleString()} <small>L</small></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-title">Total Cost</div>
-                    <div class="stat-value">$${totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                    <div class="stat-detail">Avg $${avgCostPerKm}/km</div>
+                    <div class="stat-value">$${Number(totalCost).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">Lubrication Cost</div>
-                    <div class="stat-value">$${totalLubeCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                    <div class="stat-detail">${((totalLubeCost/totalCost)*100).toFixed(1)}% of total</div>
+                    <div class="stat-title">Avg Efficiency</div>
+                    <div class="stat-value">${avgKmPerLiter} <small>km/L</small></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">Efficiency Rating</div>
-                    <div class="stat-value">${avgKmPerLiter > 10 ? '🌟' : avgKmPerLiter > 8 ? '⭐' : '📊'}</div>
-                    <div class="stat-detail">${avgKmPerLiter} km/L average</div>
+                    <div class="stat-title">Avg Cost/km</div>
+                    <div class="stat-value">$${avgCostPerKm}</div>
                 </div>
             `;
             
@@ -585,8 +579,6 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const vehicle = document.getElementById('vehicleFilter').value;
             const driver = document.getElementById('driverFilter').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
             
             filteredData = originalData.filter(row => {
                 // Search filter
@@ -601,13 +593,6 @@
                 // Driver filter
                 if (driver && row['Driver Name'] !== driver) return false;
                 
-                // Date filter
-                if (dateFrom || dateTo) {
-                    const rowDate = new Date(row['Date'] || row['Timestamp']);
-                    if (dateFrom && rowDate < new Date(dateFrom)) return false;
-                    if (dateTo && rowDate > new Date(dateTo)) return false;
-                }
-                
                 return true;
             });
             
@@ -619,8 +604,6 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('vehicleFilter').value = '';
             document.getElementById('driverFilter').value = '';
-            document.getElementById('dateFrom').value = '';
-            document.getElementById('dateTo').value = '';
             filterData();
         }
 
@@ -629,11 +612,10 @@
             let html = '<tr>';
             
             headers.forEach(header => {
-                if (header !== 'PDF Report Link') { // Hide PDF link if not needed
+                if (header !== 'PDF Report Link') {
                     const displayName = header
                         .replace(/([A-Z])/g, ' $1')
                         .replace(/_/g, ' ')
-                        .replace(/\b\w/g, l => l.toUpperCase())
                         .trim();
                     html += `<th>${displayName}</th>`;
                 }
@@ -648,7 +630,7 @@
             let html = '';
 
             if (data.length === 0) {
-                html = '<tr><td colspan="100%" style="text-align: center; padding: 50px;">No matching records found</td></tr>';
+                html = '<tr><td colspan="100%" style="text-align: center; padding: 50px;">No records found</td></tr>';
             } else {
                 data.forEach(row => {
                     html += '<tr>';
@@ -663,35 +645,19 @@
                             try {
                                 const date = new Date(value);
                                 if (!isNaN(date.getTime())) {
-                                    value = date.toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    });
+                                    value = date.toLocaleString();
                                 }
                             } catch (e) {}
                         }
                         
-                        if (key.includes('Cost') || key.includes('Amount') || key.includes('Price') || key.includes('Paid')) {
+                        if (key.includes('Cost') || key.includes('Amount') || key.includes('Price')) {
                             if (value && !isNaN(value)) {
-                                value = `<span class="amount-positive">$${Number(value).toFixed(2)}</span>`;
-                            }
-                        }
-                        
-                        if (key.includes('Km') || key.includes('Liter') || key.includes('Odometer')) {
-                            if (value && !isNaN(value)) {
-                                value = Number(value).toLocaleString();
+                                value = `$${Number(value).toFixed(2)}`;
                             }
                         }
                         
                         if (key === 'Drive Folder Link' && value) {
                             value = `<a href="${value}" target="_blank" class="drive-link">📁 View Folder</a>`;
-                        }
-                        
-                        if (key === 'Lubrication Type' && value) {
-                            value = `<span class="badge badge-success">${value}</span>`;
                         }
                         
                         html += `<td>${value}</td>`;
@@ -705,37 +671,29 @@
         }
 
         function exportToCSV() {
-            if (filteredData.length === 0) {
-                alert('No data to export');
-                return;
-            }
-
-            const headers = Object.keys(filteredData[0]).filter(h => h !== 'PDF Report Link');
+            if (filteredData.length === 0) return;
             
-            let csvContent = headers.join(',') + '\n';
+            const headers = Object.keys(filteredData[0]).filter(h => h !== 'PDF Report Link');
+            let csv = headers.join(',') + '\n';
             
             filteredData.forEach(row => {
                 const rowData = headers.map(header => {
                     let value = row[header] || '';
-                    // Remove HTML tags and formatting
                     value = value.toString().replace(/<[^>]*>/g, '');
-                    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                    if (value.includes(',') || value.includes('"')) {
                         value = '"' + value.replace(/"/g, '""') + '"';
                     }
                     return value;
                 });
-                csvContent += rowData.join(',') + '\n';
+                csv += rowData.join(',') + '\n';
             });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `fuel_data_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fuel_data_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
             URL.revokeObjectURL(url);
         }
 
@@ -744,6 +702,7 @@
             document.getElementById('tableContainer').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             document.getElementById('filtersSection').style.display = 'none';
+            document.getElementById('exportBtn').disabled = true;
         }
 
         function hideLoading() {
@@ -755,9 +714,9 @@
             const errorDiv = document.getElementById('error');
             errorDiv.style.display = 'block';
             errorDiv.innerHTML = `
-                <strong>⚠️ Error Loading Data</strong><br>
+                <strong>⚠️ Connection Error</strong><br><br>
                 ${message}<br><br>
-                <button onclick="loadData()" style="padding: 10px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 1em;">Try Again</button>
+                <button onclick="loadData()">Try Again</button>
             `;
         }
     </script>
