@@ -2,837 +2,550 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>OnPoint OnTime Fleet - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onpoint Group · Fuel Recon</title>
+    <!-- Bootstrap 5 + icons + chart.js -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            max-width: 400px;
-            width: 100%;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .header img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-        }
-
-        .form-section {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #eef2f6;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s;
-            background: #f8fafc;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group input[type="password"] {
-            letter-spacing: 3px;
-        }
-
-        .form-group select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #eef2f6;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s;
-            background: #f8fafc;
-            cursor: pointer;
-        }
-
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .remember-me input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .remember-me label {
-            color: #555;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .forgot-password {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        .register-link {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .register-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            background: #f44336;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-            animation: shake 0.5s ease-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        .success-message {
-            background: #4caf50;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .password-toggle {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #666;
-        }
-
-        .demo-credentials {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            border-left: 4px solid #667eea;
-        }
-
-        .demo-credentials p {
-            margin: 5px 0;
-            color: #555;
-        }
-
-        .demo-credentials strong {
-            color: #667eea;
-        }
-
-        .back-to-login {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .back-to-login a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .back-to-login a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                margin: 10px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .remember-forgot {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-        }
+        body { background: #f0f5fa; font-family: 'Segoe UI', system-ui; }
+        .glass-card { background: white; border-radius: 2rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .btn-onpoint { background: #0b2b4a; color: white; border-radius: 40px; padding: 0.6rem 2rem; border: none; }
+        .btn-onpoint:hover { background: #1f4a6e; }
+        .badge-approved { background: #dff0d8; color: #2e6b2e; padding: 0.3rem 1rem; border-radius: 30px; }
+        .badge-missing { background: #fef1d6; color: #a66907; padding: 0.3rem 1rem; border-radius: 30px; }
+        .badge-mismatch { background: #fadddd; color: #a33a3a; padding: 0.3rem 1rem; border-radius: 30px; }
+        .filter-chip { background: white; border-radius: 40px; padding: 0.5rem 1.2rem; cursor: pointer; border: 1px solid #dee2e6; }
+        .filter-chip.active { background: #0b2b4a; color: white; }
+        .connection-status { font-size: 0.8rem; padding: 0.3rem 1rem; border-radius: 20px; background: #f8f9fa; }
+        .summary-card { background: #e9ecef; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; }
+        .summary-value { font-size: 1.5rem; font-weight: bold; color: #0b2b4a; }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="header">
-            <!-- You can replace with your company logo -->
-            <div style="font-size: 50px; margin-bottom: 10px;">🚛</div>
-            <h1>OnPoint Fuel Recon Reports</h1>
-            <p>Secure Access Portal</p>
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-gas-pump fa-3x" style="color:#0b2b4a;"></i>
+                <h2 class="fw-bold" style="color:#0b2b4a;">Onpoint Group · Fuel Recon</h2>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="connection-status" id="connectionStatus">
+                    <i class="fas fa-circle-notch fa-spin me-1"></i>Checking...
+                </span>
+            </div>
         </div>
 
-        <div class="form-section">
-            <div class="error-message" id="errorMessage">
-                ❌ Invalid username or password
-            </div>
-            <div class="success-message" id="successMessage">
-                ✅ Login successful! Redirecting...
-            </div>
-            <div class="success-message" id="registerSuccessMessage">
-                ✅ Registration successful! Please login with your credentials.
-            </div>
+        <!-- KPI Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Total Swipes</span><h3 id="totalSwipes">0</h3></div></div>
+            <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Approved</span><h3 id="totalApproved">0</h3></div></div>
+            <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Not Approved</span><h3 id="totalNoEr">0</h3></div></div>
+            <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Total Variance</span><h3 id="totalVariance">R0</h3></div></div>
+        </div>
 
-            <!-- Demo credentials for testing -->
-            <div class="demo-credentials">
-                <p><strong>🔐 Demo Credentials:</strong></p>
-                <p>Username: <strong>admin@onpoint.co.za</strong> or <strong>driver1</strong></p>
-                <p>Password: <strong>**********</strong></p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username or Email *</label>
-                    <input type="text" id="username" placeholder="Enter your username or email" required autocomplete="username">
+        <!-- Input Form -->
+        <div class="glass-card mb-4">
+            <div class="row g-3">
+                <div class="col-md-2"><input type="date" id="swipeDate" class="form-control rounded-pill" value="2025-03-25"></div>
+                <div class="col-md-2">
+                    <select id="costCenter" class="form-select rounded-pill">
+                        <option>Onpoint Group HQ</option><option>DI Solutions</option><option>Aqua Telecoms</option>
+                        <option>Nkanyezi Projects</option><option>Onpoint Ontime Solutions</option>
+                    </select>
                 </div>
-
-                <div class="form-group password-toggle">
-                    <label for="password">Password *</label>
-                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
-                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                <div class="col-md-2">
+                    <select id="department" class="form-select rounded-pill">
+                        <option>Admin</option><option>Fleet</option><option>Operations</option><option>Sales</option>
+                        <option>Finance & IT</option><option>Warehouse</option>
+                    </select>
                 </div>
-
-                <div class="remember-forgot">
-                    <div class="remember-me">
-                        <input type="checkbox" id="rememberMe">
-                        <label for="rememberMe">Remember me</label>
-                    </div>
-                    <a href="#" class="forgot-password" onclick="forgotPassword()">Forgot Password?</a>
+                <div class="col-md-2">
+                    <select id="driverName" class="form-select rounded-pill">
+                        <option>Moses</option><option>Paul</option><option>Nkanyeko</option><option>Thebo</option>
+                        <option>Tebello</option><option>Michael</option><option>Devon</option><option>Joseph</option>
+                    </select>
                 </div>
-
-                <button type="submit" class="login-btn" id="loginBtn">
-                    🔐 Sign In
-                </button>
-
-                <div class="register-link">
-                    Don't have an account? <a href="#" onclick="showRegister()">Register here</a>
+                <div class="col-md-2"><input type="text" id="erNo" class="form-control rounded-pill" placeholder="ER No. or 0"></div>
+                <div class="col-md-2"><input type="number" id="erAmount" class="form-control rounded-pill" placeholder="R.Amount (Requested)"></div>
+                <div class="col-md-2"><input type="number" id="swipeAmount" class="form-control rounded-pill" placeholder="Swiped amount"></div>
+                <div class="col-12 text-end">
+                    <button class="btn btn-onpoint px-5" id="addSwipeBtn"><i class="fas fa-save me-2"></i>Save Record</button>
                 </div>
-            </form>
-
-            <!-- Registration Form (initially hidden) -->
-            <div id="registerForm" style="display: none;">
-                <h3 style="color: #333; margin-bottom: 20px; text-align: center;">Create New Account</h3>
-                <form id="registerUserForm">
-                    <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" id="regFullName" placeholder="John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address *</label>
-                        <input type="email" id="regEmail" placeholder="john@onpoint.co.za" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Username *</label>
-                        <input type="text" id="regUsername" placeholder="johndoe" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password *</label>
-                        <input type="password" id="regPassword" placeholder="Create password" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password *</label>
-                        <input type="password" id="regConfirmPassword" placeholder="Confirm password" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Employee Number</label>
-                        <input type="text" id="regEmployeeNumber" placeholder="EMP001">
-                    </div>
-                    <div class="form-group">
-                        <label>Role</label>
-                        <select id="regRole">
-                            <option value="driver">Driver</option>
-                            <option value="manager">Fleet Manager</option>
-                            <option value="admin">Administrator</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="login-btn" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);">
-                        📝 Create Account
-                    </button>
-                    <div class="back-to-login">
-                        <a href="#" onclick="showLogin()">← Back to Login</a>
-                    </div>
-                </form>
             </div>
+        </div>
+
+        <!-- Advanced Filters Section -->
+        <div class="glass-card mb-4">
+            <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filter Totals</h5>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Department</label>
+                    <select id="filterDepartment" class="form-select rounded-pill">
+                        <option value="all">All Departments</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Fleet">Fleet</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Finance & IT">Finance & IT</option>
+                        <option value="Warehouse">Warehouse</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Cost Center</label>
+                    <select id="filterCostCenter" class="form-select rounded-pill">
+                        <option value="all">All Cost Centers</option>
+                        <option value="Onpoint Group HQ">Onpoint Group HQ</option>
+                        <option value="DI Solutions">DI Solutions</option>
+                        <option value="Aqua Telecoms">Aqua Telecoms</option>
+                        <option value="Nkanyezi Projects">Nkanyezi Projects</option>
+                        <option value="Onpoint Ontime Solutions">Onpoint Ontime Solutions</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Driver</label>
+                    <select id="filterDriver" class="form-select rounded-pill">
+                        <option value="all">All Drivers</option>
+                        <option value="Moses">Moses</option>
+                        <option value="Paul">Paul</option>
+                        <option value="Nkanyeko">Nkanyeko</option>
+                        <option value="Thebo">Thebo</option>
+                        <option value="Tebello">Tebello</option>
+                        <option value="Michael">Michael</option>
+                        <option value="Devon">Devon</option>
+                        <option value="Joseph">Joseph</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Show Unrequested Only</label>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="filterUnrequested">
+                        <label class="form-check-label" for="filterUnrequested">Show only ER = 0 (not approved)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Totals Cards -->
+        <div class="row g-3 mb-4" id="summaryTotals">
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <span class="text-secondary">Filtered Swipes</span>
+                    <div class="summary-value" id="filteredSwipes">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <span class="text-secondary">Filtered Requested</span>
+                    <div class="summary-value" id="filteredRequested">R0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <span class="text-secondary">Filtered Swiped</span>
+                    <div class="summary-value" id="filteredSwiped">R0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <span class="text-secondary">Filtered Variance</span>
+                    <div class="summary-value" id="filteredVariance">R0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="d-flex gap-3 mb-4">
+            <span class="filter-chip active" id="filterAll">All</span>
+            <span class="filter-chip" id="filterApproved">Approved</span>
+            <span class="filter-chip" id="filterNotApproved">Not Approved</span>
+            <div class="ms-auto">
+                <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search...">
+            </div>
+        </div>
+
+        <!-- Tables -->
+        <div class="row">
+            <div class="col-12">
+                <div class="glass-card">
+                    <ul class="nav nav-tabs" id="tab">
+                        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#all">All Records</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#exceptions">Exceptions</a></li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane active" id="all">
+                            <div style="max-height:400px; overflow:auto">
+                                <table class="table table-sm">
+                                    <thead><tr><th>Date</th><th>Driver</th><th>Dept</th><th>Cost Center</th><th>ER No.</th><th>Requested (R)</th><th>Swiped (R)</th><th>Variance (R)</th><th>Status</th></tr></thead>
+                                    <tbody id="allRecordsBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="exceptions">
+                            <div style="max-height:400px; overflow:auto">
+                                <table class="table table-sm">
+                                    <thead><tr><th>Date</th><th>Driver</th><th>Dept</th><th>Cost Center</th><th>ER No.</th><th>Requested (R)</th><th>Swiped (R)</th><th>Issue</th></tr></thead>
+                                    <tbody id="discrepancyBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Button -->
+        <div class="text-end mt-3">
+            <button class="btn btn-outline-secondary rounded-pill" id="exportPdfBtn"><i class="far fa-file-pdf me-2"></i>Export PDF</button>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <div style="color: #333; font-weight: 600;">Processing...</div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ============================================
-        // CONFIGURATION - REPLACE WITH YOUR APPS SCRIPT URL
-        // ============================================
-        const CONFIG = {
-            // Your Google Apps Script Web App URL (from deployment)
-            GAS_URL: 'https://script.google.com/macros/s/AKfycbxFhlaIFEJGYnzX8r9cEx47X31tiXtn-xGFvUS2z6bjixFj8MK0_ffIlE_1Dqrkyym_Hg/exec',
+        (function() {
+            // ============================================================
+            // ONLY ONE PLACE TO UPDATE - REPLACE THIS URL WITH YOUR ACTUAL APPS SCRIPT URL
+            // ============================================================
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwu2XscmBfnUTGy8ohNgqBJCi5n7CAXeu33_xW7LzJjAfG82KZb_qPEGVkrnnflis5r/exec';  // <--- CHANGE THIS ONE LINE ONLY
             
-            // Redirect URL after successful login (your fuel app)
-            REDIRECT_URL: 'dashboard.html', // or full URL like 'https://yourdomain.com/dashboard.html'
-            
-            // Session timeout in milliseconds (8 hours)
-            SESSION_TIMEOUT: 8 * 60 * 60 * 1000
-        };
+            // Your sheet IDs (these are correct)
+            const SHEET_ID = '1lgQdmhMDk9UYtN1v-aLf6MnodF-W0fMDS-d_yZ6Lcl4';
+            const SHEET_NAME = 'Fuel Recon';
+            const DRIVE_FOLDER_ID = '1al8guXtgk-PJWwdNvd2umUXYv4AvwXSM';
 
-        // Store registered users in localStorage (for demo purposes)
-        // In production, this would be handled by your backend
-        let registeredUsers = [];
+            // Data store
+            let fuelRecords = [
+                { id: '1', date: '2025-03-18', driver: 'Moses', department: 'Fleet', costCenter: 'Onpoint Group HQ', erNo: 'ER-101', erAmount: 250.00, swipeAmount: 245.75 },
+                { id: '2', date: '2025-03-18', driver: 'Paul', department: 'Operations', costCenter: 'DI Solutions', erNo: 'ER-102', erAmount: 190.00, swipeAmount: 189.30 },
+                { id: '3', date: '2025-03-19', driver: 'Nkanyeko', department: 'Warehouse', costCenter: 'Aqua Telecoms', erNo: '0', erAmount: 0, swipeAmount: 312.20 },
+                { id: '4', date: '2025-03-19', driver: 'Thebo', department: 'Sales', costCenter: 'Nkanyezi Projects', erNo: 'ER-104', erAmount: 100.00, swipeAmount: 98.40 },
+                { id: '5', date: '2025-03-20', driver: 'Tebello', department: 'Finance & IT', costCenter: 'Onpoint Ontime Solutions', erNo: 'ER-105', erAmount: 570.00, swipeAmount: 567.80 },
+                { id: '6', date: '2025-03-20', driver: 'Michael', department: 'Fleet', costCenter: 'Onpoint Group HQ', erNo: '0', erAmount: 0, swipeAmount: 110.25 },
+                { id: '7', date: '2025-03-21', driver: 'Devon', department: 'Sales', costCenter: 'DI Solutions', erNo: 'ER-107', erAmount: 78.00, swipeAmount: 76.50 },
+                { id: '8', date: '2025-03-21', driver: 'Joseph', department: 'Warehouse', costCenter: 'Aqua Telecoms', erNo: 'ER-108', erAmount: 430.00, swipeAmount: 424.90 }
+            ];
 
-        // Load registered users from localStorage on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const stored = localStorage.getItem('onpoint_registered_users');
-            if (stored) {
-                registeredUsers = JSON.parse(stored);
-            }
-            
-            const session = localStorage.getItem('onpoint_session');
-            if (session) {
-                const sessionData = JSON.parse(session);
-                const now = new Date().getTime();
+            let chartInstance = null;
+            let currentFilter = 'all';
+
+            // Test connection (only runs if URL is not placeholder)
+            function testConnection() {
+                const statusEl = document.getElementById('connectionStatus');
                 
-                // Check if session is still valid
-                if (now - sessionData.timestamp < CONFIG.SESSION_TIMEOUT) {
-                    // Auto-login
-                    window.location.href = CONFIG.REDIRECT_URL;
-                } else {
-                    // Session expired
-                    localStorage.removeItem('onpoint_session');
+                if (GAS_URL.includes('YOUR_ACTUAL_SCRIPT_ID')) {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-warning me-1"></i>Update GAS_URL in line 98';
+                    return;
                 }
-            }
-        });
 
-        // Toggle password visibility
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.querySelector('.toggle-password');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.textContent = '👁️‍🗨️';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.textContent = '👁️';
-            }
-        }
+                const callbackName = 'test_' + Date.now();
+                const timeout = setTimeout(() => {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-warning me-1"></i>Offline mode';
+                    cleanup();
+                }, 3000);
 
-        // Forgot password handler
-        function forgotPassword() {
-            const email = prompt('Enter your email address to reset password:');
-            if (email) {
-                alert('Password reset link has been sent to ' + email);
-                // In production, this would call your Apps Script to send reset email
-            }
-        }
-
-        // Show registration form
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('registerSuccessMessage').style.display = 'none';
-        }
-
-        // Show login form
-        function showLogin() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('registerSuccessMessage').style.display = 'none';
-        }
-
-        // Handle login form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            if (!username || !password) {
-                showError('Please enter both username and password');
-                return;
-            }
-            
-            // Show loading
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loginBtn').disabled = true;
-            
-            try {
-                // Check against registered users first (for demo)
-                const registeredUser = registeredUsers.find(u => 
-                    (u.username === username || u.email === username) && u.password === password
-                );
-                
-                // Demo credentials
-                const isDemoUser = (username === 'admin@onpoint.co.za' && password === 'password123') ||
-                                  (username === 'driver1' && password === 'password123');
-                
-                if (registeredUser || isDemoUser) {
-                    
-                    // Simulate API delay
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    
-                    // Determine user info
-                    let userInfo;
-                    if (registeredUser) {
-                        userInfo = {
-                            userId: registeredUser.email,
-                            username: registeredUser.username,
-                            email: registeredUser.email,
-                            fullName: registeredUser.fullName,
-                            role: registeredUser.role
-                        };
-                    } else {
-                        userInfo = {
-                            userId: username,
-                            username: username,
-                            email: username.includes('@') ? username : username + '@onpoint.co.za',
-                            fullName: username === 'admin@onpoint.co.za' ? 'Admin User' : 'Driver User',
-                            role: username === 'admin@onpoint.co.za' ? 'admin' : 'driver'
-                        };
-                    }
-                    
-                    // Create session
-                    const sessionData = {
-                        ...userInfo,
-                        timestamp: new Date().getTime(),
-                        expires: new Date().getTime() + CONFIG.SESSION_TIMEOUT
-                    };
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('onpoint_session', JSON.stringify(sessionData));
-                    } else {
-                        sessionStorage.setItem('onpoint_session', JSON.stringify(sessionData));
-                    }
-                    
-                    // Show success
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('errorMessage').style.display = 'none';
-                    
-                    // Redirect to fuel app
-                    setTimeout(() => {
-                        window.location.href = CONFIG.REDIRECT_URL;
-                    }, 1500);
-                    
-                } else {
-                    showError('Invalid username or password');
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    document.getElementById('loginBtn').disabled = false;
+                function cleanup() {
+                    clearTimeout(timeout);
+                    if (window[callbackName]) delete window[callbackName];
+                    const script = document.querySelector(`script[src*="${callbackName}"]`);
+                    if (script) script.remove();
                 }
-                
-                // Production code - uncomment when using with Apps Script
-                /*
-                // Call Google Apps Script for authentication
-                const response = await fetch(CONFIG.GAS_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'login',
-                        username: username,
-                        password: password,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    // Create session
-                    const sessionData = {
-                        userId: result.userId,
-                        username: result.username,
-                        email: result.email,
-                        fullName: result.fullName,
-                        role: result.role,
-                        timestamp: new Date().getTime(),
-                        expires: new Date().getTime() + CONFIG.SESSION_TIMEOUT
-                    };
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('onpoint_session', JSON.stringify(sessionData));
-                    } else {
-                        sessionStorage.setItem('onpoint_session', JSON.stringify(sessionData));
-                    }
-                    
-                    // Show success
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('errorMessage').style.display = 'none';
-                    
-                    // Redirect to fuel app
-                    setTimeout(() => {
-                        window.location.href = CONFIG.REDIRECT_URL;
-                    }, 1500);
-                    
-                } else {
-                    showError(result.message || 'Invalid username or password');
-                }
-                */
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('Connection error. Please try again.');
-                document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('loginBtn').disabled = false;
-            }
-        });
 
-        // Handle registration form submission
-        document.getElementById('registerUserForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const fullName = document.getElementById('regFullName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const username = document.getElementById('regUsername').value.trim();
-            const password = document.getElementById('regPassword').value.trim();
-            const confirmPassword = document.getElementById('regConfirmPassword').value.trim();
-            const employeeNumber = document.getElementById('regEmployeeNumber').value.trim();
-            const role = document.getElementById('regRole').value;
-            
-            // Validate
-            if (!fullName || !email || !username || !password) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
-            
-            // Check if username or email already exists
-            if (registeredUsers.some(u => u.username === username)) {
-                alert('Username already exists. Please choose another one.');
-                return;
-            }
-            
-            if (registeredUsers.some(u => u.email === email)) {
-                alert('Email already registered. Please use another email or login.');
-                return;
-            }
-            
-            // Show loading
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            
-            try {
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Create new user object
-                const newUser = {
-                    fullName,
-                    email,
-                    username,
-                    password, // In production, this should be hashed
-                    employeeNumber,
-                    role,
-                    registeredAt: new Date().toISOString()
+                window[callbackName] = function() {
+                    clearTimeout(timeout);
+                    statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Connected';
+                    cleanup();
                 };
-                
-                // Add to registered users array
-                registeredUsers.push(newUser);
-                
-                // Save to localStorage (for demo persistence)
-                localStorage.setItem('onpoint_registered_users', JSON.stringify(registeredUsers));
-                
-                // Hide loading
-                document.getElementById('loadingOverlay').style.display = 'none';
-                
-                // Show success message on login form
-                document.getElementById('registerSuccessMessage').style.display = 'block';
-                
-                // Clear registration form
-                document.getElementById('registerUserForm').reset();
-                
-                // Switch to login form
-                showLogin();
-                
-                // Pre-fill login form with registered username
-                document.getElementById('username').value = username;
-                document.getElementById('password').value = '';
-                
-                // Auto-hide success message after 5 seconds
-                setTimeout(() => {
-                    document.getElementById('registerSuccessMessage').style.display = 'none';
-                }, 5000);
-                
-                // Production code - uncomment when using with Apps Script
-                /*
-                const response = await fetch(CONFIG.GAS_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'register',
-                        fullName: fullName,
-                        email: email,
-                        username: username,
-                        password: password,
-                        employeeNumber: employeeNumber,
-                        role: role,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    // Hide loading
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    
-                    // Show success message on login form
-                    document.getElementById('registerSuccessMessage').style.display = 'block';
-                    
-                    // Clear registration form
-                    document.getElementById('registerUserForm').reset();
-                    
-                    // Switch to login form
-                    showLogin();
-                    
-                    // Pre-fill login form with registered username
-                    document.getElementById('username').value = username;
-                    document.getElementById('password').value = '';
-                    
-                    // Auto-hide success message after 5 seconds
-                    setTimeout(() => {
-                        document.getElementById('registerSuccessMessage').style.display = 'none';
+
+                const script = document.createElement('script');
+                script.src = GAS_URL + '?callback=' + callbackName + '&test=1';
+                script.onerror = function() {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-warning me-1"></i>Offline mode';
+                    cleanup();
+                };
+                document.body.appendChild(script);
+            }
+
+            // Save to Google Sheets
+            function saveToSheet(record) {
+                return new Promise((resolve) => {
+                    // Skip if URL not set
+                    if (GAS_URL.includes('YOUR_ACTUAL_SCRIPT_ID')) {
+                        resolve({ status: 'local' });
+                        return;
+                    }
+
+                    const callbackName = 'cb_' + Date.now();
+                    const timeout = setTimeout(() => {
+                        cleanup();
+                        resolve({ status: 'local' });
                     }, 5000);
-                } else {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    alert(result.message || 'Registration failed');
-                }
-                */
+
+                    function cleanup() {
+                        clearTimeout(timeout);
+                        if (window[callbackName]) delete window[callbackName];
+                        const script = document.querySelector(`script[src*="${callbackName}"]`);
+                        if (script) script.remove();
+                    }
+
+                    window[callbackName] = function(response) {
+                        clearTimeout(timeout);
+                        cleanup();
+                        resolve(response || { status: 'success' });
+                    };
+
+                    const params = new URLSearchParams({
+                        callback: callbackName,
+                        date: record.date,
+                        driver: record.driver,
+                        department: record.department,
+                        costCenter: record.costCenter,
+                        erNo: record.erNo,
+                        erAmount: record.erAmount || 0,
+                        swipeAmount: record.swipeAmount,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    const script = document.createElement('script');
+                    script.src = GAS_URL + '?' + params.toString();
+                    script.onerror = function() {
+                        cleanup();
+                        resolve({ status: 'local' });
+                    };
+                    document.body.appendChild(script);
+                });
+            }
+
+            // Get filtered records based on all filters
+            function getFilteredRecords() {
+                const departmentFilter = document.getElementById('filterDepartment').value;
+                const costCenterFilter = document.getElementById('filterCostCenter').value;
+                const driverFilter = document.getElementById('filterDriver').value;
+                const unrequestedOnly = document.getElementById('filterUnrequested').checked;
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+                return fuelRecords.filter(r => {
+                    // Department filter
+                    if (departmentFilter !== 'all' && r.department !== departmentFilter) return false;
+                    
+                    // Cost center filter
+                    if (costCenterFilter !== 'all' && r.costCenter !== costCenterFilter) return false;
+                    
+                    // Driver filter
+                    if (driverFilter !== 'all' && r.driver !== driverFilter) return false;
+                    
+                    // Unrequested only filter
+                    if (unrequestedOnly && r.erNo !== '0') return false;
+                    
+                    // Search term
+                    if (searchTerm && !r.driver.toLowerCase().includes(searchTerm) && 
+                        !r.department.toLowerCase().includes(searchTerm) && 
+                        !r.costCenter.toLowerCase().includes(searchTerm) && 
+                        !(r.erNo && r.erNo.toLowerCase().includes(searchTerm))) return false;
+                    
+                    // Status filter (approved/not approved)
+                    if (currentFilter === 'approved') return r.erNo && r.erNo !== '0';
+                    if (currentFilter === 'notApproved') return !r.erNo || r.erNo === '0';
+                    
+                    return true;
+                });
+            }
+
+            // Update summary totals
+            function updateSummaryTotals() {
+                const filtered = getFilteredRecords();
                 
-            } catch (error) {
-                console.error('Registration error:', error);
-                document.getElementById('loadingOverlay').style.display = 'none';
-                alert('Connection error. Please try again.');
+                const swipes = filtered.length;
+                const requested = filtered.reduce((sum, r) => sum + (r.erAmount || 0), 0);
+                const swiped = filtered.reduce((sum, r) => sum + r.swipeAmount, 0);
+                const variance = swiped - requested;
+
+                document.getElementById('filteredSwipes').innerText = swipes;
+                document.getElementById('filteredRequested').innerText = 'R' + requested.toFixed(2);
+                document.getElementById('filteredSwiped').innerText = 'R' + swiped.toFixed(2);
+                document.getElementById('filteredVariance').innerText = (variance >= 0 ? '+' : '') + 'R' + variance.toFixed(2);
+                
+                if (variance >= 0) {
+                    document.getElementById('filteredVariance').style.color = '#28a745';
+                } else {
+                    document.getElementById('filteredVariance').style.color = '#dc3545';
+                }
             }
-        });
 
-        // Show error message
-        function showError(message) {
-            const errorEl = document.getElementById('errorMessage');
-            errorEl.textContent = '❌ ' + message;
-            errorEl.style.display = 'block';
-            
-            setTimeout(() => {
-                errorEl.style.display = 'none';
-            }, 5000);
-        }
+            // Refresh UI
+            function refreshUI() {
+                const filtered = getFilteredRecords();
 
-        // Logout function (can be called from other pages)
-        function logout() {
-            localStorage.removeItem('onpoint_session');
-            sessionStorage.removeItem('onpoint_session');
-            window.location.href = 'login.html';
-        }
+                // Update KPI (unfiltered totals)
+                document.getElementById('totalSwipes').innerText = fuelRecords.length;
+                document.getElementById('totalApproved').innerText = fuelRecords.filter(r => r.erNo && r.erNo !== '0').length;
+                document.getElementById('totalNoEr').innerText = fuelRecords.filter(r => !r.erNo || r.erNo === '0').length;
+                
+                const totalVar = fuelRecords.reduce((acc, r) => acc + (r.swipeAmount - (r.erAmount || 0)), 0);
+                document.getElementById('totalVariance').innerText = 'R' + totalVar.toFixed(2);
 
-        // Check authentication on protected pages
-        function checkAuth() {
-            const session = localStorage.getItem('onpoint_session') || sessionStorage.getItem('onpoint_session');
-            
-            if (!session) {
-                window.location.href = 'login.html';
-                return null;
+                // Update summary totals
+                updateSummaryTotals();
+
+                // All records table
+                let allHtml = '';
+                filtered.forEach(r => {
+                    const variance = (r.swipeAmount - (r.erAmount || 0)).toFixed(2);
+                    const status = (r.erNo && r.erNo !== '0') ? '<span class="badge-approved">approved</span>' : '<span class="badge-missing">not approved</span>';
+                    allHtml += `<tr>
+                        <td>${r.date}</td><td>${r.driver}</td><td>${r.department}</td><td>${r.costCenter}</td><td>${r.erNo || '0'}</td>
+                        <td>R${(r.erAmount || 0).toFixed(2)}</td><td>R${r.swipeAmount.toFixed(2)}</td>
+                        <td class="${parseFloat(variance) < 0 ? 'text-danger' : 'text-success'}">R${variance}</td>
+                        <td>${status}</td>
+                    </tr>`;
+                });
+                document.getElementById('allRecordsBody').innerHTML = allHtml || '<tr><td colspan="9" class="text-center">No records match your filters</td></tr>';
+
+                // Exceptions table
+                let discHtml = '';
+                filtered.forEach(r => {
+                    const variance = r.swipeAmount - (r.erAmount || 0);
+                    if (!r.erNo || r.erNo === '0') {
+                        discHtml += `<tr class="table-warning">
+                            <td>${r.date}</td><td>${r.driver}</td><td>${r.department}</td><td>${r.costCenter}</td><td>0</td>
+                            <td>R0</td><td>R${r.swipeAmount.toFixed(2)}</td>
+                            <td><span class="badge-missing">No ER</span></td>
+                        </tr>`;
+                    } else if (Math.abs(variance) > 0.5) {
+                        discHtml += `<tr class="table-danger">
+                            <td>${r.date}</td><td>${r.driver}</td><td>${r.department}</td><td>${r.costCenter}</td><td>${r.erNo}</td>
+                            <td>R${(r.erAmount || 0).toFixed(2)}</td><td>R${r.swipeAmount.toFixed(2)}</td>
+                            <td><span class="badge-mismatch">Variance R${variance.toFixed(2)}</span></td>
+                        </tr>`;
+                    }
+                });
+                document.getElementById('discrepancyBody').innerHTML = discHtml || '<tr><td colspan="8" class="text-center">No exceptions match your filters</td></tr>';
             }
-            
-            const sessionData = JSON.parse(session);
-            const now = new Date().getTime();
-            
-            if (now - sessionData.timestamp > CONFIG.SESSION_TIMEOUT) {
-                logout();
-                return null;
-            }
-            
-            return sessionData;
-        }
 
-        // Make functions globally available
-        window.togglePassword = togglePassword;
-        window.forgotPassword = forgotPassword;
-        window.showRegister = showRegister;
-        window.showLogin = showLogin;
-        window.logout = logout;
-        window.checkAuth = checkAuth;
+            // Event Listeners
+            document.getElementById('addSwipeBtn').addEventListener('click', async function() {
+                const record = {
+                    date: document.getElementById('swipeDate').value,
+                    costCenter: document.getElementById('costCenter').value,
+                    department: document.getElementById('department').value,
+                    driver: document.getElementById('driverName').value,
+                    erNo: document.getElementById('erNo').value.trim() || '0',
+                    erAmount: parseFloat(document.getElementById('erAmount').value) || 0,
+                    swipeAmount: parseFloat(document.getElementById('swipeAmount').value)
+                };
+
+                if (!record.date || isNaN(record.swipeAmount)) {
+                    alert('Please enter date and swipe amount');
+                    return;
+                }
+
+                record.id = Date.now() + '-' + Math.random().toString(36);
+                fuelRecords.push(record);
+                
+                const btn = this;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+                
+                await saveToSheet(record);
+                
+                btn.innerHTML = '<i class="fas fa-check me-2"></i>Saved!';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+                
+                document.getElementById('erNo').value = '';
+                document.getElementById('erAmount').value = '';
+                document.getElementById('swipeAmount').value = '';
+                refreshUI();
+            });
+
+            // Filter event listeners
+            document.getElementById('filterDepartment').addEventListener('change', refreshUI);
+            document.getElementById('filterCostCenter').addEventListener('change', refreshUI);
+            document.getElementById('filterDriver').addEventListener('change', refreshUI);
+            document.getElementById('filterUnrequested').addEventListener('change', refreshUI);
+            document.getElementById('searchInput').addEventListener('input', refreshUI);
+
+            document.getElementById('filterAll').addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active'); currentFilter = 'all'; refreshUI();
+            });
+            
+            document.getElementById('filterApproved').addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active'); currentFilter = 'approved'; refreshUI();
+            });
+            
+            document.getElementById('filterNotApproved').addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active'); currentFilter = 'notApproved'; refreshUI();
+            });
+
+            // PDF Export
+            document.getElementById('exportPdfBtn').addEventListener('click', function() {
+                const exceptionsBody = document.getElementById('discrepancyBody').innerHTML;
+                const currentDate = new Date().toLocaleDateString();
+                
+                // Get current filter values for report header
+                const deptFilter = document.getElementById('filterDepartment').value;
+                const costFilter = document.getElementById('filterCostCenter').value;
+                const driverFilter = document.getElementById('filterDriver').value;
+                const unrequestedOnly = document.getElementById('filterUnrequested').checked;
+                
+                let filterText = 'All Records';
+                if (deptFilter !== 'all') filterText = `Department: ${deptFilter}`;
+                if (costFilter !== 'all') filterText += ` | Cost Center: ${costFilter}`;
+                if (driverFilter !== 'all') filterText += ` | Driver: ${driverFilter}`;
+                if (unrequestedOnly) filterText += ' | Unrequested Only';
+                
+                const pdfContent = `
+                    <div style="padding: 20px; font-family: Arial, sans-serif;">
+                        <h2 style="color: #0b2b4a; text-align: center;">Onpoint Group - Fuel Recon Exceptions Report</h2>
+                        <p style="text-align: center; color: #666;">Generated: ${currentDate}</p>
+                        <p style="text-align: center; color: #666;">Filters: ${filterText}</p>
+                        <hr style="margin: 20px 0;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                            <thead>
+                                <tr style="background-color: #0b2b4a; color: white;">
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Date</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Driver</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Dept</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Cost Center</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">ER No.</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Requested</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Swiped</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Issue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exceptionsBody.replace(/<span class="badge-[^>]*>/g, '<span style="background: #f0f0f0; padding: 3px 10px; border-radius: 15px;">')}
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 30px; font-size: 12px; color: #999; text-align: center;">
+                            This report includes all fuel transactions with exceptions based on current filters
+                        </p>
+                    </div>
+                `;
+
+                const element = document.createElement('div');
+                element.innerHTML = pdfContent;
+                document.body.appendChild(element);
+                
+                html2pdf().from(element).set({
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: `Fuel_Recon_Exceptions_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, letterRendering: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                }).save().then(() => {
+                    document.body.removeChild(element);
+                });
+            });
+
+            // Initialize
+            testConnection();
+            refreshUI();
+        })();
     </script>
 </body>
 </html>
