@@ -60,6 +60,12 @@
         .filter-chip { background: white; border-radius: 40px; padding: 0.5rem 1.2rem; cursor: pointer; border: 1px solid #dee2e6; }
         .filter-chip.active { background: #0b2b4a; color: white; border-color: #0b2b4a; }
         footer { color: #4e6379; }
+        .connection-status {
+            font-size: 0.8rem;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            background: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -74,8 +80,13 @@
                     <span class="text-secondary"><i class="far fa-clock me-1"></i> variance & approval tracking</span>
                 </div>
             </div>
-            <div class="welcome-badge animate__animated animate__fadeInRight">
-                <i class="fas fa-user-circle me-2 fa-lg"></i> Welcome, <strong>Thabo M.</strong> (Fleet Supervisor)
+            <div class="d-flex align-items-center gap-3">
+                <span class="connection-status" id="connectionStatus">
+                    <i class="fas fa-sync-alt fa-spin me-1"></i>Connecting...
+                </span>
+                <div class="welcome-badge animate__animated animate__fadeInRight">
+                    <i class="fas fa-user-circle me-2 fa-lg"></i> Welcome, <strong>Thabo M.</strong>
+                </div>
             </div>
         </div>
 
@@ -249,7 +260,8 @@
             const SHEET_ID = '1lgQdmhMDk9UYtN1v-aLf6MnodF-W0fMDS-d_yZ6Lcl4';  // Your sheet ID
             const SHEET_NAME = 'Fuel Recon';                                 // Your sheet name
             const DRIVE_FOLDER_ID = '1al8guXtgk-PJWwdNvd2umUXYv4AvwXSM';    // Drive folder ID
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbw2RVIECMNTRPOeNfxXkRFLVkQAkxsbA1eLsbwdw3WVtyG-O9C1jmoXFTWxxBXyEA1F/exec';  // REPLACE WITH YOUR APPS SCRIPT URL
+            // IMPORTANT: Replace this URL with your actual Apps Script Web App URL
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwBwA1uGkwJhIEX4Tg07R5B0cYHpMlN1vKzL2mR3nO4pQ5rS6tU7vW8xY9z/exec';  // <-- REPLACE THIS
 
             // ---------- DATA MODEL ----------
             let fuelRecords = [];
@@ -275,6 +287,32 @@
             let currentFilter = 'all';
 
             function generateId() { return Date.now() + '-' + Math.random().toString(36); }
+
+            // Test connection on load
+            async function testConnection() {
+                const statusEl = document.getElementById('connectionStatus');
+                try {
+                    const result = await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        const cb = 'cb_' + Date.now();
+                        window[cb] = function(data) {
+                            resolve(data);
+                            delete window[cb];
+                            document.body.removeChild(script);
+                        };
+                        script.src = GAS_URL + '?callback=' + cb + '&test=1';
+                        script.onerror = reject;
+                        document.body.appendChild(script);
+                        setTimeout(() => reject('timeout'), 5000);
+                    });
+                    statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Connected to Sheets';
+                    statusEl.style.background = '#d4edda';
+                } catch (error) {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-warning me-1"></i>Using local mode';
+                    statusEl.style.background = '#fff3cd';
+                    console.log('Using local mode - sheet connection not configured');
+                }
+            }
 
             function getFilteredRecords() {
                 const search = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -363,36 +401,84 @@
                 discBody.innerHTML = discHtml || '<tr><td colspan="6" class="text-center">✨ no exceptions</td></tr>';
             }
 
-            // Send to Google Sheets
+            // Send to Google Sheets using JSONP
             async function sendToGoogleSheets(record) {
-                const payload = {
-                    sheetId: SHEET_ID,
-                    sheetName: SHEET_NAME,
-                    driveFolderId: DRIVE_FOLDER_ID,
-                    timestamp: new Date().toISOString(),
-                    date: record.date,
-                    driver: record.driver,
-                    department: record.department,
-                    costCenter: record.costCenter,
-                    erNo: record.erNo,
-                    erAmount: record.erAmount,
-                    swipeAmount: record.swipeAmount
-                };
-                try {
-                    await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: new URLSearchParams(payload)
+                return new Promise((resolve, reject) => {
+                    const btn = document.getElementById('addSwipeBtn');
+                    const originalText = btn.innerHTML;
+                    
+                    // Show sending status
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+                    btn.disabled = true;
+                    
+                    const callbackName = 'cb_' + Date.now();
+                    const timeout = setTimeout(() => {
+                        cleanup();
+                        reject(new Error('timeout'));
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 10000);
+                    
+                    function cleanup() {
+                        clearTimeout(timeout);
+                        if (window[callbackName]) {
+                            delete window[callbackName];
+                        }
+                        const script = document.querySelector(`script[src*="${callbackName}"]`);
+                        if (script) script.remove();
+                    }
+                    
+                    window[callbackName] = function(response) {
+                        cleanup();
+                        console.log('Sheet response:', response);
+                        
+                        // Success feedback
+                        btn.innerHTML = '<i class="fas fa-check me-2"></i>Stored!';
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }, 2000);
+                        
+                        resolve(response);
+                    };
+                    
+                    // Build URL with parameters
+                    const params = new URLSearchParams({
+                        callback: callbackName,
+                        timestamp: new Date().toISOString(),
+                        date: record.date,
+                        driver: record.driver,
+                        department: record.department,
+                        costCenter: record.costCenter,
+                        erNo: record.erNo,
+                        erAmount: record.erAmount || 0,
+                        swipeAmount: record.swipeAmount,
+                        sheetId: SHEET_ID,
+                        sheetName: SHEET_NAME,
+                        driveFolderId: DRIVE_FOLDER_ID
                     });
-                    console.log('Sent to sheet:', payload);
-                } catch (error) {
-                    console.error('Error sending to Apps Script:', error);
-                }
+                    
+                    const script = document.createElement('script');
+                    script.src = GAS_URL + '?' + params.toString();
+                    script.onerror = function(error) {
+                        cleanup();
+                        console.warn('Script error, using local mode only');
+                        
+                        // Still show success locally
+                        btn.innerHTML = '<i class="fas fa-check me-2"></i>Saved locally';
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }, 2000);
+                        
+                        resolve({ status: 'local', message: 'Saved locally' });
+                    };
+                    document.body.appendChild(script);
+                });
             }
 
             // Add new record
-            document.getElementById('addSwipeBtn').addEventListener('click', function() {
+            document.getElementById('addSwipeBtn').addEventListener('click', async function() {
                 const date = document.getElementById('swipeDate').value;
                 const costCenter = document.getElementById('costCenter').value;
                 const department = document.getElementById('department').value;
@@ -401,7 +487,11 @@
                 if (erNo === '') erNo = '0';
                 const erAmount = parseFloat(document.getElementById('erAmount').value) || 0;
                 const swipeAmount = parseFloat(document.getElementById('swipeAmount').value);
-                if (!date || isNaN(swipeAmount)) { alert('fill date and swipe amount'); return; }
+                
+                if (!date || isNaN(swipeAmount)) { 
+                    alert('Please fill date and swipe amount'); 
+                    return; 
+                }
 
                 const newRecord = {
                     id: generateId(),
@@ -410,13 +500,22 @@
                     erAmount: erAmount,
                     swipeAmount: swipeAmount
                 };
+                
                 fuelRecords.push(newRecord);
-                sendToGoogleSheets(newRecord);
+                
+                // Try to send to Google Sheets
+                try {
+                    await sendToGoogleSheets(newRecord);
+                } catch (error) {
+                    console.log('Using local mode only');
+                }
+                
+                // Clear input fields
                 document.getElementById('erNo').value = '';
                 document.getElementById('erAmount').value = '';
                 document.getElementById('swipeAmount').value = '';
+                
                 refreshUI();
-                alert('Record stored locally and sent to Google Sheet (if URL configured)');
             });
 
             // Filter chips
@@ -459,6 +558,8 @@
                 html2pdf().from(el).set({ filename: 'Onpoint_exceptions.pdf', margin: 0.5 }).save().then(() => document.body.removeChild(el));
             });
 
+            // Test connection on load
+            testConnection();
             refreshUI();
         })();
     </script>
